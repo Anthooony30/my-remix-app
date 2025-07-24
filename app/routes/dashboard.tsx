@@ -78,7 +78,7 @@ export default function Dashboard() {
       <NavigationBar />
 
       <main className="p-6 bg-white dark:bg-gray-100 min-h-screen">
-        <div className="flex justify-between items-center mb-6">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
           <h1 className="text-3xl font-
           
           text-amber-900">Coffee Inventory Dashboard</h1>

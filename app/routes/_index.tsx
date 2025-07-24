@@ -1,5 +1,5 @@
   import type { MetaFunction } from "@remix-run/node";
-  import NavigationBar from "~/COMPONENTS/navigationBar";
+  import FrontPagenavigationBar from "~/COMPONENTS/FrontPagenavigationBar";
   import Footerss from "~/COMPONENTS/footers";
   import { Link } from "@remix-run/react";
 
@@ -13,8 +13,8 @@
   export default function index() {
     return (
       <>
-          {/* Navigation */}
-          <NavigationBar />
+          {/* Front Page Navigation */}
+          <FrontPagenavigationBar />
       
 
         {/* Front Page Content */}

@@ -3,7 +3,8 @@ import NavigationBar from "~/COMPONENTS/navigationBar";
 import Footerss from "~/COMPONENTS/footers";
 import { useState } from "react";
 import { useNavigate } from "@remix-run/react";
-import api from "~/utils/axios"; // Axios instance
+import api from "~/utils/axios";
+import FrontPagenavigationBar from "~/COMPONENTS/FrontPagenavigationBar";
 
 export const meta: MetaFunction = () => {
   return [
@@ -45,7 +46,7 @@ export default function Register() {
 
   return (
     <>
-      <NavigationBar />
+      <FrontPagenavigationBar />
 
       <main className="flex items-center justify-center px-6 py-20 bg-white dark:bg-gray-100 min-h-[70vh]">
         <div className="w-full max-w-md bg-white shadow-md rounded-lg p-8">
