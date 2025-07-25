@@ -19,7 +19,7 @@
 
         {/* Front Page Content */}
         <main className="flex flex-col items-center justify-center text-center px-6 py-20 bg-white dark:bg-gray-100 min-h-[70vh]">
-          <h1 className="text-3xl md:text-4xl font-bold lg:text-5xl text-amber-900 mb-6">
+          <h1 className="text-3xl md:text-4xl font-bold lg: -5xl text-amber-900 mb-6">
             Welcome to Coffee Inventory System
           </h1>
           <p className="text-gray-700 text-md sm:text-lg max-w-2xl mb-10">

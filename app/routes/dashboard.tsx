@@ -7,6 +7,7 @@ import ViewItemModal from "~/COMPONENTS/ViewItemModal";
 import api from "~/utils/axios";
 import { useEffect, useState } from "react";
 
+
 type CoffeeItem = {
   id: number;
   name: string;
@@ -27,6 +28,10 @@ export default function Dashboard() {
   const [editingItemId, setEditingItemId] = useState<number | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [viewingItemId, setViewingItemId] = useState<number | null>(null);
+  const [deleteItemId, setDeleteItemId] = useState<number | null>(null);
+  const [deleteItemName, setDeleteItemName] = useState<string>("");
+  const [sizeFilter, setSizeFilter] = useState<string>("All");
+
 
 
 
@@ -40,16 +45,19 @@ export default function Dashboard() {
     fetchItems();
   }, []);
 
-  const handleDelete = async (id: number) => {
-    if (!confirm("Are you sure you want to delete this item?")) return;
+      const confirmDelete = async () => {
+      if (deleteItemId === null) return;
 
-    try {
-      await api.delete(`/inventory/${id}`);
-      fetchItems(); // Refresh list after deletion
-    } catch (error) {
-      console.error("Delete failed:", error);
-    }
-  };
+      try {
+        await api.delete(`/inventory/${deleteItemId}`);
+        fetchItems();
+      } catch (error) {
+        console.error("Delete failed:", error);
+      } finally {
+        setDeleteItemId(null); // Close modal
+      }
+    };
+
 
   const handleAddItem = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -73,6 +81,8 @@ export default function Dashboard() {
     }
   };
 
+  
+
   return (
     <>
       <NavigationBar />
@@ -82,6 +92,7 @@ export default function Dashboard() {
           <h1 className="text-3xl font-
           
           text-amber-900">Coffee Inventory Dashboard</h1>
+          
           <input
                 type="text"
                 placeholder="Search by name..."
@@ -89,12 +100,23 @@ export default function Dashboard() {
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="border border-gray-300 rounded text-black px-4 py-2 ml-auto max-w-sm sm:2xl md:w-96 lg:6xl transition"
               />
+            <select
+              value={sizeFilter}
+              onChange={(e) => setSizeFilter(e.target.value)}
+              className="border border-gray-300 text-black rounded px-4 py-2"
+            >
+              <option value="All">All Sizes</option>
+              <option value="Small">Small</option>
+              <option value="Medium">Medium</option>
+              <option value="Large">Large</option>
+            </select>
           <button
             onClick={() => setShowForm(!showForm)}
             className="bg-amber-700 text-white px-4 py-2 rounded hover:bg-amber-800 transition"
           >
             {showForm ? "Cancel" : "+ Add Item"}
           </button>
+          
         </div>
 
         {showForm && (
@@ -124,13 +146,14 @@ export default function Dashboard() {
             <tbody>
               {items
                   .filter((item) => {
-                    const search = searchTerm.toLowerCase();
-                    const itemName = item.name.toLowerCase();
-                    return (
-                      itemName.startsWith(search) || 
-                      (search.length > 0 && itemName[0] === search[0])
-                    );
-                  })
+                      const search = searchTerm.toLowerCase();
+                      const matchesSearch = item.name.toLowerCase().startsWith(search);
+
+                      const matchesSize =
+                        sizeFilter === "All" || item.size.toLowerCase() === sizeFilter.toLowerCase();
+
+                      return matchesSearch && matchesSize;
+                    })
                 .map((item) => (
                   <tr key={item.id} className="border-t hover:bg-gray-100 text-black">
                     <td className="py-3 px-6">{item.id}</td>
@@ -154,7 +177,10 @@ export default function Dashboard() {
                         Edit 	
                       </button>
                     <button
-                      onClick={() => handleDelete(item.id)}
+                      onClick={() => {
+                        setDeleteItemId(item.id);
+                        setDeleteItemName(item.name);
+                      }}
                       className="bg-[#ac1414] text-white px-3 py-1 rounded hover:bg-[#e81b1b]"
                     >
                       Delete
@@ -179,6 +205,32 @@ export default function Dashboard() {
             onClose={() => setViewingItemId(null)}
           />
           )}
+
+          {deleteItemId !== null && (
+            <div className="fixed inset-0 bg-gray bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50">
+              <div className="bg-white dark:bg-gray-100 p-6 rounded-lg shadow-md w-full max-w-md">
+                <h2 className="text-xl font-bold text-red-700 mb-4">Confirm Delete</h2>
+                <p className="mb-6 text-gray-800">
+                  Are you sure you want to delete <span className="font-semibold">{deleteItemName}</span>?
+                </p>
+                <div className="flex justify-end gap-4">
+                  <button
+                    onClick={() => setDeleteItemId(null)}
+                    className="px-4 py-2 bg-gray-400 rounded hover:bg-gray-700 transition"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={confirmDelete}
+                    className="px-4 py-2 bg-[#ac1414] text-white rounded hover:bg-red-700 transition"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
       </main>
 
       <Footers />

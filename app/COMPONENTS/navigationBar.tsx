@@ -52,7 +52,7 @@ export default function NavigationBar() {
         </div>
       </header>
 
-      {/* ✅ Logout Confirmation Modal */}
+      {/* Logout Confirmation */}
       {showConfirm && (
         <div className="fixed inset-0 bg-opacity-40 backdrop-blur-sm flex justify-center items-center z-50">
           <div className="bg-white p-6 rounded-xl shadow-lg max-w-sm w-full text-center space-y-4">
