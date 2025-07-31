@@ -13,30 +13,53 @@ export default function EditItemForm({ itemId, onClose, onUpdate }: Props) {
   const [quantity, setQuantity] = useState<number | "">("");
 
   useEffect(() => {
-    api.get(`/inventory/${itemId}`).then((res) => {
-      const { name, size, quantity } = res.data;
-      setName(name);
-      setSize(size);
-      setQuantity(quantity);
-    });
+    const fetchItem = async () => {
+      try {
+        const res = await api.get(`/inventory/${itemId}`);
+        const { name, size, quantity } = res.data;
+        setName(name);
+        setSize(size);
+        setQuantity(quantity);
+      } catch (error) {
+        console.error("Failed to fetch item:", error);
+        alert("Unable to load item.");
+      }
+    };
+
+    fetchItem();
   }, [itemId]);
 
   const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  await api.put("/inventory", {
-    id: itemId,         
-    name,
-    size,
-    quantity,
-  });
-  onUpdate();
-  onClose();
-  alert("Item updated!");
-};
+    e.preventDefault();
+
+    if (quantity === "") {
+      alert("Quantity is required.");
+      return;
+    }
+
+    try {
+      console.log("Updating item:", { itemId, name, size, quantity });
+
+      await api.put(`/inventory/${itemId}`, {
+        name,
+        size,
+        quantity,
+      });
+
+      alert("Item updated!");
+      onUpdate(); // Refresh list
+      onClose();  // Close modal
+    } catch (error: any) {
+      console.error("Update failed:", error);
+      if (error.response?.data?.errors) {
+        console.error("Validation errors:", error.response.data.errors);
+      }
+      alert("Failed to update item.");
+    }
+  };
 
   return (
     <div className="fixed inset-0 bg-gray bg-opacity-40 backdrop-blur-sm flex items-center justify-center z-[9999]">
-
       <div className="bg-white text-black p-6 rounded-xl shadow-xl w-full max-w-lg relative">
         <button
           onClick={onClose}
@@ -69,7 +92,10 @@ export default function EditItemForm({ itemId, onClose, onUpdate }: Props) {
             <input
               type="number"
               value={quantity}
-              onChange={(e) => setQuantity(Number(e.target.value))}
+              onChange={(e) => {
+                const value = e.target.value;
+                setQuantity(value === "" ? "" : Number(value));
+              }}
               className="border border-gray-300 p-2 w-full rounded"
               required
             />
